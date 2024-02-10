@@ -39,12 +39,17 @@
     db.mentors.aggregate([ { $project: { courseOpted: 1, studentCount: { $size: "$students" } } }, { $sort: { studentCount: -1 } }, { $limit: 1 }] )
     
 6. Find the number of users who are absent and task is not submitted  between 15 oct-2020 and 31-oct-2020
-    db.users.aggregate([
+   // Query 6: Find the number of users who were absent and had tasks not submitted between 15 Oct 2020 and 31 Oct 2020
+db.users.aggregate([
   {
     $match: {
       "absentDays.date": { $gte: "2020-10-15", $lte: "2020-10-31" },
-      $expr: { $gt: [{ $size: "$absentDays" }, 0] },
-      $expr: { $gt: [{ $size: "$tasks" }, 0] }
+      $expr: {
+        $and: [
+          { $gt: [{ $size: "$absentDays" }, 0] },
+          { $gt: [{ $size: "$tasks" }, 0] }
+        ]
+      }
     }
   },
   {
