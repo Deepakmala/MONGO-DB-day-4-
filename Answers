@@ -1,5 +1,5 @@
 1. Find all the topics and tasks which are thought in the month of October
-db.aggregate([
+   db.aggregate([
   {
     $match: {
       $or: [
@@ -12,58 +12,39 @@ db.aggregate([
     $project: {
       _id: 0,
       type: 1,
-      name: { $cond: { if: { $eq: ["$type", "topic"] }, then: "$topicname", else: "$taskname" } },
+      name: {
+        $cond: {
+          if: { $eq: ["$type", "topic"] },
+          then: "$topicname",
+          else: "$taskname"
+        }
+      },
       mentor: "$mentor",
       date: "$date"
-    }
-  }
-])
-
-   
-
-2. Find all the company drives which appeared between 15 oct-2020 and 31-oct-2020
-db.companies.find({
-  recruitmentDate: { $gte: "2020-10-15", $lte: "2020-10-31" }
-});
-
-   
-
-3. Find all the company drives and students who are appeared for the placement.
-db.companies.find({}, { companyName: 1, selected: 1 });
-
-   
-
-4. Find the number of problems solved by the user in codekata
-  db.users.find({}, { name: 1, codekata: 1, _id: 0 });
-
-
-5. Find all the mentors with who has the mentee's count more than 15
-  db.mentors.aggregate([
-  {
-    $project: {
-      courseOpted: 1,
-      studentCount: { $size: "$students" }
-    }
-  },
-  {
-    $match: {
-      studentCount: { $gt: 15 }
     }
   }
 ]);
 
 
+2. Find all the company drives which appeared between 15 oct-2020 and 31-oct-2020
+    db.companies.find({recruitmentDate: {$gte: "2020-10-15",$lte: "2020-10-31"}})
+
+3. Find all the company drives and students who are appeared for the placement.
+    db.companies.find({},{companyName:1,selected:1})
+
+4. Find the number of problems solved by the user in codekata
+    db.users.find({},{name:1,codekata:1,_id:0})
+
+5. Find all the mentors with who has the mentee's count more than 15
+    db.mentors.aggregate([ { $project: { courseOpted: 1, studentCount: { $size: "$students" } } }, { $sort: { studentCount: -1 } }, { $limit: 1 }] )
     
 6. Find the number of users who are absent and task is not submitted  between 15 oct-2020 and 31-oct-2020
-
-   db.users.aggregate([
+    db.users.aggregate([
   {
     $match: {
-      $and: [
-        { "absentDays.date": { $gte: "2020-10-15", $lte: "2020-10-31" } },
-        { $expr: { $gt: [{ $size: "$absentDays" }, 0] } },
-        { $expr: { $gt: [{ $size: "$tasks" }, 0] } }
-      ]
+      "absentDays.date": { $gte: "2020-10-15", $lte: "2020-10-31" },
+      $expr: { $gt: [{ $size: "$absentDays" }, 0] },
+      $expr: { $gt: [{ $size: "$tasks" }, 0] }
     }
   },
   {
@@ -97,4 +78,3 @@ db.companies.find({}, { companyName: 1, selected: 1 });
     }
   }
 ]);
-
